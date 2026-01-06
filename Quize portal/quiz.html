@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Quiz</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #f1f8f6);
+        }
+        .quiz-wrapper {
+            width: 650px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 { color: #2e7d32; margin: 0; }
+        #timer { color: red; font-weight: bold; }
+        .question { display: none; }
+        label {
+            display: block;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        label:hover { background: #f1f8f4; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .secondary { background: #9e9e9e; }
+    </style>
+</head>
+
+<body>
+
+<script>
+    if (!localStorage.getItem("username")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+<div class="quiz-wrapper">
+
+    <div class="header">
+        <h2>Online Assessment</h2>
+        <div>
+            <div>Welcome, <b id="user"></b></div>
+            <div id="timer">10:00</div>
+        </div>
+    </div>
+
+    <p id="counter"></p>
+
+    <form id="quizForm">
+
+        <div class="question" data-correct="Hyper Text Markup Language">
+            <p>What does HTML stand for?</p>
+            <label><input type="radio" name="q1" value="Hyper Tool Markup">Hyper Tool Markup</label>
+            <label><input type="radio" name="q1" value="Hyper Text Markup Language">Hyper Text Markup Language</label>
+            <label><input type="radio" name="q1" value="High Text Machine Language">High Text Machine Language</label>
+            <label><input type="radio" name="q1" value="Hyperlinks Text Markup">Hyperlinks Text Markup</label>
+        </div>
+
+        <div class="question" data-correct="jQuery">
+            <p>Which is a JavaScript library?</p>
+            <label><input type="radio" name="q2" value="Bootstrap">Bootstrap</label>
+            <label><input type="radio" name="q2" value="jQuery">jQuery</label>
+            <label><input type="radio" name="q2" value="HTML">HTML</label>
+            <label><input type="radio" name="q2" value="CSS">CSS</label>
+        </div>
+
+        <div class="question" data-correct="<script>">
+            <p>Which tag is used for JavaScript?</p>
+            <label><input type="radio" name="q3" value="<javascript>">&lt;javascript&gt;</label>
+            <label><input type="radio" name="q3" value="<js>">&lt;js&gt;</label>
+            <label><input type="radio" name="q3" value="<script>">&lt;script&gt;</label>
+            <label><input type="radio" name="q3" value="<code>">&lt;code&gt;</label>
+        </div>
+
+        <div class="question" data-correct="Sun Microsystems">
+            <p>Java was developed by?</p>
+            <label><input type="radio" name="q4" value="Microsoft">Microsoft</label>
+            <label><input type="radio" name="q4" value="Apple">Apple</label>
+            <label><input type="radio" name="q4" value="Google">Google</label>
+            <label><input type="radio" name="q4" value="Sun Microsystems">Sun Microsystems</label>
+        </div>
+
+        <div class="question" data-correct="//">
+            <p>Which symbol is used for comments in JavaScript?</p>
+            <label><input type="radio" name="q5" value="<!-- -->">&lt;!-- --&gt;</label>
+            <label><input type="radio" name="q5" value="##">##</label>
+            <label><input type="radio" name="q5" value="//">//</label>
+            <label><input type="radio" name="q5" value="**">**</label>
+        </div>
+
+        <div style="text-align:center">
+            <button type="button" class="secondary" id="prev">Previous</button>
+            <button type="button" id="next">Next</button>
+            <button type="submit" id="submit" style="display:none">Submit</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+$(function () {
+
+    $("#user").text(localStorage.getItem("username"));
+
+    let index = 0;
+    let questions = $(".question");
+
+    function showQuestion() {
+        questions.hide().eq(index).show();
+        $("#counter").text(`Question ${index + 1} of ${questions.length}`);
+        $("#prev").toggle(index > 0);
+        $("#next").toggle(index < questions.length - 1);
+        $("#submit").toggle(index === questions.length - 1);
+    }
+
+    showQuestion();
+
+    $("#next").click(() => { index++; showQuestion(); });
+    $("#prev").click(() => { index--; showQuestion(); });
+
+    let time = 600;
+    setInterval(() => {
+        let m = Math.floor(time / 60);
+        let s = time % 60;
+        $("#timer").text(`${m}:${s < 10 ? '0' : ''}${s}`);
+        if (time-- <= 0) $("#quizForm").submit();
+    }, 1000);
+
+    $("#quizForm").submit(function (e) {
+        e.preventDefault();
+
+        let incorrect = [], score = 0;
+
+        questions.each(function () {
+            let q = $(this).find("p").text();
+            let c = $(this).data("correct");
+            let s = $(this).find("input:checked").val() || "Not Answered";
+
+            if (s === c) score++;
+            else incorrect.push({ questionText: q, selected: s, correct: c });
+        });
+
+        localStorage.setItem("score", score);
+        localStorage.setItem("total", questions.length);
+        localStorage.setItem("incorrect", JSON.stringify(incorrect));
+
+        location.href = "result.html";
+    });
+});
+</script>
+
+</body>
+</html>

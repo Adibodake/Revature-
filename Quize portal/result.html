@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quiz Result</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #f1f8f6);
+        }
+
+        .result-box {
+            width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 22px;
+            margin: 15px 0;
+        }
+
+        .wrong {
+            background: #fff3f3;
+            border-left: 5px solid #e53935;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .correct {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            background: #4CAF50;
+            color: #fff;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="result-box">
+        <h2>Assessment Result</h2>
+        <p style="text-align:center;font-weight:600;">
+            Candidate: <span id="user"></span>
+        </p>
+
+        <div class="score" id="score"></div>
+
+        <h3>Incorrect Answers Review</h3>
+        <div id="incorrectList"></div>
+
+        <button onclick="location.href='login.html'">Logout</button>
+    </div>
+
+    <script>
+        document.getElementById("user").innerText =
+            localStorage.getItem("username");
+
+        let score = localStorage.getItem("score");
+        let total = localStorage.getItem("total");
+        let incorrect = JSON.parse(localStorage.getItem("incorrect"));
+
+        document.getElementById("score").innerText =
+            `Your Score: ${score} / ${total}`;
+
+        let html = incorrect.length === 0
+            ? "<p class='correct'>🎉 All answers are correct!</p>"
+            : incorrect.map(q => `
+            <div class="wrong">
+                <p><b>${q.questionText}</b></p>
+                <p>Your Answer: ${q.selected}</p>
+                <p class="correct">Correct Answer: ${q.correct}</p>
+            </div>
+        `).join("");
+
+        document.getElementById("incorrectList").innerHTML = html;
+    </script>
+
+</body>
+
+</html>
